@@ -29,9 +29,11 @@ export function Downloader() {
   }
 
   function onReset() {
-    const searching = info.loading;
+    info.clear();
     transfer.reset();
-    if (searching) info.restart();
+    setUrl("");
+    setQuality("best");
+    setSubtitles(false);
   }
 
   return (

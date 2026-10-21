@@ -9,7 +9,7 @@ export function cleanYtError(raw: string) {
   if (/unsupported version of python/i.test(message)) {
     return "yt-dlp ishga tushmadi. `npm install` ni qayta ishga tushiring.";
   }
-  if (/connection reset|timed out|network is unreachable|unable to download/i.test(message)) {
+  if (/connection reset|timed out|network is unreachable|unable to download|failed to establish|nodename nor servname/i.test(message)) {
     return "Sayt bilan aloqa uzildi. Internetda bu sayt ochilishini tekshiring va qayta urinib ko'ring.";
   }
   if (/login required|cookies|sign in|private video|video unavailable|not available/i.test(message)) {

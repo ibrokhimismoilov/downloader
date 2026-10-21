@@ -19,7 +19,7 @@ async function readJson(request: Request) {
   try {
     const body: unknown = await request.json();
     if (!body || typeof body !== "object") return null;
-    return body as { url?: unknown; quality?: unknown; filepath?: unknown };
+    return body as { url?: unknown };
   } catch {
     return null;
   }

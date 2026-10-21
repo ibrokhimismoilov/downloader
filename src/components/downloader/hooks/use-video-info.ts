@@ -9,7 +9,6 @@ export function useVideoInfo(url: string) {
   const [loaded, setLoaded] = useState<{ key: string; video: VideoInfo } | null>(null);
   const [failure, setFailure] = useState<{ key: string; message: string } | null>(null);
   const [pendingKey, setPendingKey] = useState("");
-  const [attempt, setAttempt] = useState(0);
   const controllerRef = useRef<AbortController | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -27,15 +26,14 @@ export function useVideoInfo(url: string) {
       controller.abort();
       clearTimeout(timer);
     };
-  }, [videoKey, url, attempt]);
+  }, [videoKey, url]);
 
-  function restart() {
+  function clear() {
     controllerRef.current?.abort();
     if (timerRef.current) clearTimeout(timerRef.current);
     setLoaded(null);
     setFailure(null);
-    setPendingKey(videoKey);
-    setAttempt((current) => current + 1);
+    setPendingKey("");
   }
 
   return {
@@ -43,7 +41,7 @@ export function useVideoInfo(url: string) {
     info: loaded?.key === videoKey ? loaded.video : null,
     error: failure?.key === videoKey ? failure.message : clientUrlMessage(url),
     loading: pendingKey === videoKey && videoKey !== "",
-    restart,
+    clear,
   };
 }
 
