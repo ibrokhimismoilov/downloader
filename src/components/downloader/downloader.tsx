@@ -12,6 +12,7 @@ import { PageHeader } from "../page-header/page-header";
 export function Downloader() {
   const [url, setUrl] = useState("");
   const [quality, setQuality] = useState<QualityId>("best");
+  const [subtitles, setSubtitles] = useState(false);
   const info = useVideoInfo(url);
   const transfer = useDownload();
   const showCard = Boolean(info.info || info.loading || transfer.download);
@@ -24,7 +25,13 @@ export function Downloader() {
   function onSubmit(event: FormEvent) {
     event.preventDefault();
     if (!info.videoKey || transfer.busy) return;
-    void transfer.start(url, quality);
+    void transfer.start(url, quality, subtitles);
+  }
+
+  function onReset() {
+    const searching = info.loading;
+    transfer.reset();
+    if (searching) info.restart();
   }
 
   return (
@@ -53,7 +60,9 @@ export function Downloader() {
             infoError={info.error}
             downloadError={transfer.error}
             showInfoError={!info.loading}
+            showReset={info.loading || transfer.busy}
             onUrlChange={onUrlChange}
+            onReset={onReset}
             onSubmit={onSubmit}
           />
           <section className="mt-6" aria-live="polite">
@@ -64,7 +73,9 @@ export function Downloader() {
                 quality={quality}
                 busy={transfer.busy}
                 download={transfer.download}
+                subtitles={subtitles}
                 onQuality={setQuality}
+                onSubtitles={setSubtitles}
                 onReveal={() => void transfer.reveal()}
               />
             ) : info.error ? null : (

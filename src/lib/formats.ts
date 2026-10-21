@@ -1,3 +1,4 @@
+import type { Flags } from "youtube-dl-exec";
 import type { QualityId } from "@/types/media";
 
 export const formats = {
@@ -25,4 +26,14 @@ export const formats = {
 
 export function isQuality(value: unknown): value is QualityId {
   return typeof value === "string" && value in formats;
+}
+
+export function subtitleFlags(enabled: boolean): Partial<Flags> {
+  if (!enabled) return {};
+  return {
+    writeSubs: true,
+    writeAutoSubs: true,
+    subLangs: "all,-live_chat",
+    convertSubs: "srt",
+  };
 }

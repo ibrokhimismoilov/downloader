@@ -6,9 +6,10 @@ export async function POST(request: Request) {
   const url = typeof body?.url === "string" ? body.url : "";
 
   try {
-    const info = await getVideoInfo(url);
+    const info = await getVideoInfo(url, request.signal);
     return Response.json(info);
   } catch (error) {
+    if (request.signal.aborted) return new Response(null, { status: 499 });
     const message = error instanceof Error ? cleanYtError(error.message) : "Video topilmadi.";
     return Response.json({ error: message }, { status: 400 });
   }

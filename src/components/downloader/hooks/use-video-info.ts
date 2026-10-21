@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { VideoInfo } from "@/types/media";
 import { clientUrlMessage, mediaKey, readJson } from "../utils/media";
 
@@ -9,26 +9,41 @@ export function useVideoInfo(url: string) {
   const [loaded, setLoaded] = useState<{ key: string; video: VideoInfo } | null>(null);
   const [failure, setFailure] = useState<{ key: string; message: string } | null>(null);
   const [pendingKey, setPendingKey] = useState("");
+  const [attempt, setAttempt] = useState(0);
+  const controllerRef = useRef<AbortController | null>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (!videoKey) return;
 
     const controller = new AbortController();
+    controllerRef.current = controller;
     const timer = setTimeout(() => {
       void loadInfo(url, videoKey, controller, setLoaded, setFailure, setPendingKey);
     }, 500);
+    timerRef.current = timer;
 
     return () => {
       controller.abort();
       clearTimeout(timer);
     };
-  }, [videoKey, url]);
+  }, [videoKey, url, attempt]);
+
+  function restart() {
+    controllerRef.current?.abort();
+    if (timerRef.current) clearTimeout(timerRef.current);
+    setLoaded(null);
+    setFailure(null);
+    setPendingKey(videoKey);
+    setAttempt((current) => current + 1);
+  }
 
   return {
     videoKey,
     info: loaded?.key === videoKey ? loaded.video : null,
     error: failure?.key === videoKey ? failure.message : clientUrlMessage(url),
     loading: pendingKey === videoKey && videoKey !== "",
+    restart,
   };
 }
 

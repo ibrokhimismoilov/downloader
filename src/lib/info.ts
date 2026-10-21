@@ -2,30 +2,59 @@ import { assertMediaUrl } from "@/lib/assert-url";
 import { assertBinary, baseFlags, ytdlp } from "@/lib/ytdlp";
 import type { VideoInfo } from "@/types/media";
 
-export async function getVideoInfo(input: string): Promise<VideoInfo> {
+export async function getVideoInfo(input: string, signal?: AbortSignal): Promise<VideoInfo> {
   assertBinary();
   const link = assertMediaUrl(input);
-  const result = await ytdlp(link.url, {
+  const child = ytdlp.exec(link.url, {
     ...baseFlags(),
     dumpSingleJson: true,
     skipDownload: true,
   });
+  const stop = () => {
+    if (!child.killed) child.kill("SIGTERM");
+  };
+  if (signal?.aborted) stop();
+  else signal?.addEventListener("abort", stop, { once: true });
 
-  if (typeof result === "string") {
-    throw new Error("Video haqida ma'lumot olinmadi.");
+  let result: { stdout?: string; is_live?: boolean };
+  try {
+    result = await child;
+  } catch (error) {
+    if (signal?.aborted) throw new Error("Qidiruv to'xtatildi.");
+    throw error;
+  } finally {
+    signal?.removeEventListener("abort", stop);
   }
-  if (result.is_live) {
+
+  const parsed = parseInfo(result.stdout);
+  if (!parsed) throw new Error("Video haqida ma'lumot olinmadi.");
+  if (parsed.is_live) {
     throw new Error("Jonli efirni yuklab bo'lmaydi.");
   }
 
   return {
-    id: result.id,
-    title: result.title,
-    channel: result.channel || result.uploader || link.site.label,
-    duration: result.duration_string || formatDuration(result.duration),
-    thumbnail: result.thumbnail,
-    views: typeof result.view_count === "number" ? result.view_count : null,
+    id: parsed.id,
+    title: parsed.title,
+    channel: parsed.channel || parsed.uploader || link.site.label,
+    duration: parsed.duration_string || formatDuration(parsed.duration),
+    thumbnail: parsed.thumbnail,
+    views: typeof parsed.view_count === "number" ? parsed.view_count : null,
     source: link.site.label,
+  };
+}
+
+function parseInfo(stdout: string | undefined) {
+  if (!stdout || !stdout.trim().startsWith("{")) return null;
+  return JSON.parse(stdout) as {
+    id: string;
+    title: string;
+    channel?: string;
+    uploader?: string;
+    duration_string?: string;
+    duration?: number | null;
+    thumbnail: string;
+    view_count?: number | null;
+    is_live?: boolean;
   };
 }
 

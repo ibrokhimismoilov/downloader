@@ -7,13 +7,25 @@ type Props = {
   info: VideoInfo | null;
   loading: boolean;
   quality: QualityId;
+  subtitles: boolean;
   busy: boolean;
   download: DownloadEvent | null;
   onQuality: (quality: QualityId) => void;
+  onSubtitles: (subtitles: boolean) => void;
   onReveal: () => void;
 };
 
-export function VideoCard({ info, loading, quality, busy, download, onQuality, onReveal }: Props) {
+export function VideoCard({
+  info,
+  loading,
+  quality,
+  subtitles,
+  busy,
+  download,
+  onQuality,
+  onSubtitles,
+  onReveal,
+}: Props) {
   const views =
     info?.views == null
       ? null
@@ -32,6 +44,7 @@ export function VideoCard({ info, loading, quality, busy, download, onQuality, o
           </h2>
           <p className="mt-1 truncate text-sm text-muted">{meta || "Video"}</p>
           <QualityPicker quality={quality} busy={busy} onQuality={onQuality} />
+          <SubtitleChoice checked={subtitles} busy={busy} onChange={onSubtitles} />
         </div>
       </div>
       {download ? <DownloadStatus download={download} loading={loading} onReveal={onReveal} /> : null}
@@ -103,5 +116,31 @@ function QualityPicker({
         {options.find((item) => item.id === quality)?.hint}
       </p>
     </>
+  );
+}
+
+function SubtitleChoice({
+  checked,
+  busy,
+  onChange,
+}: {
+  checked: boolean;
+  busy: boolean;
+  onChange: (checked: boolean) => void;
+}) {
+  return (
+    <label className="mt-4 flex items-start gap-2 text-sm text-ink">
+      <input
+        type="checkbox"
+        checked={checked}
+        disabled={busy}
+        onChange={(event) => onChange(event.target.checked)}
+        className="mt-0.5 size-4 accent-[#e23b2f]"
+      />
+      <span>
+        Subtitrni ham yuklab ol
+        <span className="mt-0.5 block text-xs text-faint">Video yoniga .srt fayl saqlanadi.</span>
+      </span>
+    </label>
   );
 }

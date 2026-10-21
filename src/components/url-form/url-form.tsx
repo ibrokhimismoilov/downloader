@@ -10,7 +10,9 @@ type Props = {
   infoError: string | null;
   downloadError: string | null;
   showInfoError: boolean;
+  showReset: boolean;
   onUrlChange: (url: string) => void;
+  onReset: () => void;
   onSubmit: (event: FormEvent) => void;
 };
 
@@ -21,7 +23,9 @@ export function UrlForm({
   infoError,
   downloadError,
   showInfoError,
+  showReset,
   onUrlChange,
+  onReset,
   onSubmit,
 }: Props) {
   const names = siteNames();
@@ -45,6 +49,15 @@ export function UrlForm({
             inputMode="url"
             className="h-14 w-full min-w-0 bg-transparent px-4 text-base text-ink outline-none placeholder:text-faint disabled:opacity-60"
           />
+          {showReset ? (
+            <button
+              type="button"
+              onClick={onReset}
+              className="h-14 shrink-0 rounded-[22px] border border-line-strong px-5 text-base font-semibold text-ink transition hover:border-ink"
+            >
+              To&apos;xtatish
+            </button>
+          ) : null}
           <button
             type="submit"
             disabled={!canSubmit || busy}

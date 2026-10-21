@@ -8,6 +8,7 @@ export async function POST(request: Request) {
   const url = typeof body?.url === "string" ? body.url : "";
   const quality = isQuality(body?.quality) ? body.quality : "best";
   const dir = typeof body?.dir === "string" ? body.dir : "";
+  const subtitles = body?.subtitles === true;
   const encoder = new TextEncoder();
   const abort = new AbortController();
   if (request.signal.aborted) abort.abort();
@@ -26,8 +27,9 @@ export async function POST(request: Request) {
       };
 
       try {
-        await downloadVideo(url, quality, dir, send, abort.signal);
+        await downloadVideo(url, quality, dir, send, abort.signal, subtitles);
       } catch (error) {
+        if (abort.signal.aborted) return;
         const message =
           error instanceof Error ? cleanYtError(error.message) : "Video yuklanmadi.";
         send({ status: "error", progress: 0, error: message });
@@ -59,7 +61,7 @@ async function readJson(request: Request) {
   try {
     const body: unknown = await request.json();
     if (!body || typeof body !== "object") return null;
-    return body as { url?: unknown; quality?: unknown; dir?: unknown };
+    return body as { url?: unknown; quality?: unknown; dir?: unknown; subtitles?: unknown };
   } catch {
     return null;
   }

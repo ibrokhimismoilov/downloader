@@ -3,7 +3,7 @@ import path from "node:path";
 import type { Flags } from "youtube-dl-exec";
 import { assertMediaUrl } from "@/lib/assert-url";
 import { cleanYtError } from "@/lib/errors";
-import { formats } from "@/lib/formats";
+import { formats, subtitleFlags } from "@/lib/formats";
 import { createProgress } from "@/lib/progress";
 import { resolveSaveDir } from "@/lib/save-folder";
 import { assertBinary, baseFlags, ytdlp } from "@/lib/ytdlp";
@@ -15,6 +15,7 @@ export async function downloadVideo(
   dir: string,
   onProgress: (event: DownloadEvent) => void,
   signal?: AbortSignal,
+  subtitles = false,
 ) {
   assertBinary();
   const url = assertMediaUrl(input).url;
@@ -22,7 +23,7 @@ export async function downloadVideo(
   fs.mkdirSync(outputDir, { recursive: true });
 
   onProgress({ status: "starting", progress: 0 });
-  const child = ytdlp.exec(url, downloadFlags(quality, outputDir));
+  const child = ytdlp.exec(url, downloadFlags(quality, outputDir, subtitles));
   const progress = createProgress();
   const onData = (chunk: Buffer | string) => progress.consume(chunk, onProgress);
   child.stdout?.on("data", onData);
@@ -56,10 +57,11 @@ export async function downloadVideo(
   });
 }
 
-function downloadFlags(quality: QualityId, outputDir: string): Flags {
+function downloadFlags(quality: QualityId, outputDir: string, subtitles: boolean): Flags {
   const preset = formats[quality];
   const flags: Flags = {
     ...baseFlags(),
+    ...subtitleFlags(subtitles),
     format: preset.format,
     output: "%(title).100B [%(id)s].%(ext)s",
     paths: outputDir,
