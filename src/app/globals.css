@@ -1,20 +1,118 @@
 @import "tailwindcss";
 
+:root,
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #14110f;
+  --ink: #f6f1e8;
+  --muted: #cbbba6;
+  --faint: #8d8276;
+  --eyebrow: #e7b2a8;
+  --line: rgb(255 255 255 / 0.1);
+  --line-strong: rgb(255 255 255 / 0.16);
+  --surface: rgb(28 24 21 / 0.9);
+  --thumb: #2a241f;
+  --button: #f3ecdf;
+  --button-ink: #1a1410;
+  --button-hover: #ffffff;
+  --disabled: #3a332d;
+  --disabled-ink: #8d8276;
+  --danger: #ffb4a8;
+  --ok: #d7efe4;
+  --glow-red: rgb(226 59 47 / 0.2);
+  --glow-gold: rgb(212 168 92 / 0.15);
+  --shadow: 0 20px 60px rgb(0 0 0 / 0.28);
+  --track: rgb(255 255 255 / 0.1);
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f7f1e8;
+  --ink: #1c1612;
+  --muted: #6d6258;
+  --faint: #8a7d72;
+  --eyebrow: #b42318;
+  --line: rgb(28 22 18 / 0.1);
+  --line-strong: rgb(28 22 18 / 0.16);
+  --surface: rgb(255 252 247 / 0.94);
+  --thumb: #efe6da;
+  --button: #1c1612;
+  --button-ink: #f7f1e8;
+  --button-hover: #3a312b;
+  --disabled: #e4dcd2;
+  --disabled-ink: #9a8d82;
+  --danger: #b42318;
+  --ok: #176b45;
+  --glow-red: rgb(226 59 47 / 0.12);
+  --glow-gold: rgb(212 168 92 / 0.22);
+  --shadow: 0 16px 40px rgb(80 50 20 / 0.08);
+  --track: rgb(28 22 18 / 0.08);
+}
+
 @theme inline {
   --font-sans: var(--font-outfit);
   --font-serif: var(--font-fraunces);
-  --color-background: #14110f;
-  --color-foreground: #f6f1e8;
+  --color-bg: var(--bg);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-eyebrow: var(--eyebrow);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-surface: var(--surface);
+  --color-thumb: var(--thumb);
+  --color-button: var(--button);
+  --color-button-ink: var(--button-ink);
+  --color-button-hover: var(--button-hover);
+  --color-disabled: var(--disabled);
+  --color-disabled-ink: var(--disabled-ink);
+  --color-danger: var(--danger);
+  --color-ok: var(--ok);
+  --color-glow-red: var(--glow-red);
+  --color-glow-gold: var(--glow-gold);
+  --color-track: var(--track);
+  --text-base: var(--text-base-size);
+}
+
+:root {
+  --root-size: 16px;
+  --text-base-size: max(1rem, 16px);
+}
+
+@media (width < 64rem) {
+  :root {
+    --root-size: 15px;
+  }
+}
+
+@media (width < 48rem) {
+  :root {
+    --root-size: 14px;
+  }
+}
+
+html {
+  font-size: var(--root-size);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
-  background: #14110f;
-  color: #f6f1e8;
-  font-family: var(--font-outfit), sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-outfit), "Segoe UI", sans-serif;
+  font-size: var(--root-size);
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
 
 .font-serif {
   font-family: var(--font-fraunces), Georgia, serif;
+}
+
+.panel-shadow {
+  box-shadow: var(--shadow);
 }
 
 ::selection {

@@ -1,4 +1,4 @@
-import { revealInFinder } from "@/lib/youtube";
+import { revealInFinder } from "@/lib/reveal";
 
 export async function POST(request: Request) {
   let filepath = "";

@@ -1,14 +1,13 @@
-import {
-  cleanYtError,
-  downloadVideo,
-  isQuality,
-  type DownloadEvent,
-} from "@/lib/youtube";
+import { downloadVideo } from "@/lib/download-video";
+import { cleanYtError } from "@/lib/errors";
+import { isQuality } from "@/lib/formats";
+import type { DownloadEvent } from "@/types/media";
 
 export async function POST(request: Request) {
   const body = await readJson(request);
   const url = typeof body?.url === "string" ? body.url : "";
   const quality = isQuality(body?.quality) ? body.quality : "best";
+  const dir = typeof body?.dir === "string" ? body.dir : "";
   const encoder = new TextEncoder();
   const abort = new AbortController();
   if (request.signal.aborted) abort.abort();
@@ -27,7 +26,7 @@ export async function POST(request: Request) {
       };
 
       try {
-        await downloadVideo(url, quality, send, abort.signal);
+        await downloadVideo(url, quality, dir, send, abort.signal);
       } catch (error) {
         const message =
           error instanceof Error ? cleanYtError(error.message) : "Video yuklanmadi.";
@@ -60,7 +59,7 @@ async function readJson(request: Request) {
   try {
     const body: unknown = await request.json();
     if (!body || typeof body !== "object") return null;
-    return body as { url?: unknown; quality?: unknown };
+    return body as { url?: unknown; quality?: unknown; dir?: unknown };
   } catch {
     return null;
   }

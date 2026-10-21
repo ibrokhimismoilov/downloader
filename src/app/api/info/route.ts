@@ -1,4 +1,5 @@
-import { cleanYtError, getVideoInfo } from "@/lib/youtube";
+import { cleanYtError } from "@/lib/errors";
+import { getVideoInfo } from "@/lib/info";
 
 export async function POST(request: Request) {
   const body = await readJson(request);

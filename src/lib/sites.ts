@@ -31,6 +31,16 @@ export const sites = [
   },
 ] as const;
 
+export function siteNames() {
+  return sites.map((site) => site.label).join(", ");
+}
+
+export function sitePhrase() {
+  const labels = sites.map((site) => site.label);
+  const last = labels.at(-1) ?? "";
+  return `${labels.slice(0, -1).join(", ")} yoki ${last}`;
+}
+
 export type Site = (typeof sites)[number];
 
 export type MediaLink = {
@@ -40,12 +50,6 @@ export type MediaLink = {
 };
 
 export type MediaUrlIssue = "empty" | "invalid" | "protocol" | "unsupported" | "incomplete";
-
-const supportedLabels = sites.map((site) => site.label).join(", ");
-
-export function unsupportedSiteMessage() {
-  return `Hozircha ${supportedLabels} havolalari qabul qilinadi.`;
-}
 
 export function matchSite(hostname: string): Site | null {
   const host = hostname.toLowerCase().replace(/\.$/, "");
@@ -100,10 +104,7 @@ function hasVideoTarget(url: URL, siteId: Site["id"]) {
     return /video|clip|wall|video_ext/i.test(`${url.pathname}${url.search}`);
   }
   if (siteId === "ok") {
-    return (
-      /\/(video|videoembed|live)\b/i.test(url.pathname) ||
-      url.searchParams.has("st.vpl.id")
-    );
+    return /\/(video|videoembed|live)\b/i.test(url.pathname) || url.searchParams.has("st.vpl.id");
   }
   if (siteId === "tiktok") {
     const host = url.hostname.toLowerCase().replace(/^www\./, "");

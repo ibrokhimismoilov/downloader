@@ -6,35 +6,42 @@ import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 
 const execFileAsync = promisify(execFile);
-const dest = path.join(process.cwd(), "bin", "yt-dlp");
-const url =
-  "https://github.com/yt-dlp/yt-dlp/releases/download/2026.08.19/yt-dlp_macos";
+const release = "2026.08.19";
+const builds = {
+  darwin: { file: "yt-dlp", url: `https://github.com/yt-dlp/yt-dlp/releases/download/${release}/yt-dlp_macos` },
+  win32: { file: "yt-dlp.exe", url: `https://github.com/yt-dlp/yt-dlp/releases/download/${release}/yt-dlp.exe` },
+  linux: { file: "yt-dlp", url: `https://github.com/yt-dlp/yt-dlp/releases/download/${release}/yt-dlp_linux` },
+};
 
-if (process.platform !== "darwin") {
-  console.log("yt-dlp standalone binary is prepared for macOS.");
+const build = builds[process.platform];
+if (!build) {
+  console.log("yt-dlp standalone binary is prepared for macOS, Windows, and Linux.");
   process.exit(0);
 }
 
+const dest = path.join(process.cwd(), "bin", build.file);
 await mkdir(path.dirname(dest), { recursive: true });
 
 let ready = false;
 try {
   const info = await stat(dest);
-  ready = info.size > 30_000_000;
+  ready = info.size > 10_000_000;
 } catch {
   ready = false;
 }
 
 if (!ready) {
   console.log("Downloading yt-dlp…");
-  const response = await fetch(url);
+  const response = await fetch(build.url);
   if (!response.ok || !response.body) {
     throw new Error(`yt-dlp download failed (${response.status})`);
   }
   await pipeline(response.body, createWriteStream(dest));
 }
 
-await chmod(dest, 0o755);
-await execFileAsync("xattr", ["-d", "com.apple.quarantine", dest]).catch(() => {});
+if (process.platform !== "win32") await chmod(dest, 0o755);
+if (process.platform === "darwin") {
+  await execFileAsync("xattr", ["-d", "com.apple.quarantine", dest]).catch(() => {});
+}
 const { stdout } = await execFileAsync(dest, ["--version"]);
 console.log(`yt-dlp ${stdout.trim()} ready`);

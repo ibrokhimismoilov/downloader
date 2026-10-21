@@ -14,7 +14,8 @@ const fraunces = Fraunces({
 
 export const metadata: Metadata = {
   title: "Yuklab olish",
-  description: "YouTube, VK, Facebook, Instagram, OK va TikTok havolasidan videoni Downloads papkasiga saqlang.",
+  description:
+    "YouTube, VK, Facebook, Instagram, OK va TikTok havolasidan videoni tanlangan papkaga saqlang.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -22,7 +23,15 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="uz"
       className={`${outfit.variable} ${fraunces.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem("theme");document.documentElement.dataset.theme=t==="light"?"light":"dark"}catch(e){document.documentElement.dataset.theme="dark"}})()`,
+          }}
+        />
+      </head>
       <body className="min-h-full">{children}</body>
     </html>
   );
