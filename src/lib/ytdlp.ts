@@ -40,8 +40,8 @@ function ffmpegDir() {
     return process.env.FFMPEG_DIR;
   }
 
-  const ffmpegPath = optionalPackage("ffmpeg-static") as string | null;
-  const ffprobe = optionalPackage("ffprobe-static") as { path: string } | null;
+  const ffmpegPath = ffmpegPackage();
+  const ffprobe = ffprobePackage();
   if (!ffmpegPath || !fs.existsSync(/*turbopackIgnore: true*/ ffmpegPath)) {
     throw new Error("ffmpeg topilmadi. `npm install` ni qayta ishga tushiring.");
   }
@@ -56,9 +56,17 @@ function ffmpegDir() {
   return dir;
 }
 
-function optionalPackage(name: string) {
+function ffmpegPackage() {
   try {
-    return require(name);
+    return require("ffmpeg-static") as string;
+  } catch {
+    return null;
+  }
+}
+
+function ffprobePackage() {
+  try {
+    return require("ffprobe-static") as { path: string };
   } catch {
     return null;
   }
