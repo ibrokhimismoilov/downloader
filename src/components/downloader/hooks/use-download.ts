@@ -19,7 +19,8 @@ export function useDownload() {
     abortRef.current = controller;
     setBusy(true);
     setError(null);
-    setDownload({ status: "starting", progress: 0 });
+    const startedAt = clockTime();
+    setDownload({ status: "starting", progress: 0, startedAt });
 
     try {
       const response = await fetch("/api/download", {
@@ -38,7 +39,7 @@ export function useDownload() {
         const data = await readJson<{ error?: string }>(response);
         throw new Error(data?.error || "Yuklab olish boshlanmadi.");
       }
-      await readEvents(response.body, run, runRef, setDownload, setError);
+      await readEvents(response.body, run, runRef, startedAt, setDownload, setError);
     } catch (cause) {
       if (runRef.current !== run || controller.signal.aborted) return;
       setDownload(null);
@@ -77,10 +78,17 @@ export function useDownload() {
   return { download, error, busy, start, reveal, reset };
 }
 
+function clockTime() {
+  const date = new Date();
+  const part = (value: number) => String(value).padStart(2, "0");
+  return `${part(date.getHours())}:${part(date.getMinutes())}:${part(date.getSeconds())}`;
+}
+
 async function readEvents(
   body: ReadableStream<Uint8Array>,
   run: number,
   runRef: { current: number },
+  startedAt: string,
   setDownload: (event: DownloadEvent | null) => void,
   setError: (message: string | null) => void,
 ) {
@@ -101,7 +109,7 @@ async function readEvents(
         setDownload(null);
         setError(event.error || "Video yuklanmadi.");
       } else {
-        setDownload(event);
+        setDownload({ ...event, startedAt });
       }
     }
   }

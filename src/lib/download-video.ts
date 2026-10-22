@@ -49,9 +49,14 @@ export async function downloadVideo(
     throw new Error("Video yuklandi, lekin fayl topilmadi.");
   }
 
+  const snap = progress.snapshot();
+  const exact = snap.total && !snap.total.startsWith("~") ? snap.total : undefined;
   onProgress({
+    ...snap,
     status: "done",
     progress: 100,
+    downloaded: exact ?? snap.downloaded,
+    total: exact ?? snap.total,
     filepath,
     filename: path.basename(filepath),
   });
@@ -70,6 +75,8 @@ function downloadFlags(quality: QualityId, outputDir: string, subtitles: boolean
     forceOverwrites: true,
     noMtime: true,
     progress: true,
+    progressTemplate:
+      "download:[download] %(progress._percent_str)s got %(progress._downloaded_bytes_str)s of %(progress._total_bytes_str)s est %(progress._total_bytes_estimate_str)s at %(progress._speed_str)s ETA %(progress._eta_str)s",
     print: "after_move:filepath",
   };
 

@@ -15,6 +15,9 @@ export type DownloadEvent = {
   progress: number;
   speed?: string;
   eta?: string;
+  downloaded?: string;
+  total?: string;
+  startedAt?: string;
   filepath?: string;
   filename?: string;
   error?: string;

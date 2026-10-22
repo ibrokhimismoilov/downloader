@@ -17,7 +17,9 @@ export function DownloadStatus({ download, loading, onReveal }: Props) {
     <div className="border-t border-line px-5 py-4">
       <div className="mb-2 flex items-center justify-between gap-3 text-sm">
         <span className="text-ink">{describeStatus(download, loading)}</span>
-        <span className="font-mono text-muted">{percentLabel(download, done)}</span>
+        <span className="shrink-0 font-mono text-xs text-muted sm:text-sm">
+          {percentLabel(download, done)}
+        </span>
       </div>
       <div className="h-1.5 overflow-hidden rounded-full bg-track">
         <div
@@ -27,11 +29,7 @@ export function DownloadStatus({ download, loading, onReveal }: Props) {
           style={{ width: `${width}%` }}
         />
       </div>
-      {download.status === "downloading" && (download.speed || download.eta) ? (
-        <p className="mt-2 text-xs text-faint">
-          {[download.speed, download.eta ? `${download.eta} qoldi` : ""].filter(Boolean).join(" · ")}
-        </p>
-      ) : null}
+      {detailLine(download) ? <p className="mt-2 text-xs text-faint">{detailLine(download)}</p> : null}
       {done && download.filename ? (
         <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <p className="min-w-0 truncate text-sm text-ok">{download.filename}</p>
@@ -48,10 +46,25 @@ export function DownloadStatus({ download, loading, onReveal }: Props) {
   );
 }
 
+function detailLine(download: DownloadEvent) {
+  const moving = download.status === "downloading" || download.status === "merging";
+  const parts = [
+    download.startedAt ? `Start: ${download.startedAt}` : "",
+    moving && download.eta ? `Qoldi: ${download.eta}` : "",
+    moving && download.speed ? download.speed : "",
+  ];
+  return parts.filter(Boolean).join(" | ");
+}
+
 function percentLabel(download: DownloadEvent, done: boolean) {
-  if (done) return "100%";
-  if (download.status === "downloading") return `${Math.round(download.progress)}%`;
-  return download.speed || "";
+  const percent = done
+    ? "100%"
+    : download.status === "downloading" || download.status === "merging"
+      ? `${Math.round(download.progress)}%`
+      : "";
+  const downloaded = download.downloaded || (done ? download.total?.replace(/^~/, "") : "");
+  const ratio = [downloaded, download.total].filter(Boolean).join(" / ");
+  return [ratio, percent].filter(Boolean).join(" | ");
 }
 
 function describeStatus(download: DownloadEvent | null, loading: boolean) {
