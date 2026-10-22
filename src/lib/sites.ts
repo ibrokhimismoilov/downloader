@@ -29,6 +29,11 @@ export const sites = [
     label: "TikTok",
     domains: ["tiktok.com"],
   },
+  {
+    id: "rutube",
+    label: "Rutube",
+    domains: ["rutube.ru"],
+  },
 ] as const;
 
 export function siteNames() {
@@ -113,7 +118,14 @@ function hasVideoTarget(url: URL, siteId: Site["id"]) {
     }
     return /\/video\/\d{6,}/.test(url.pathname) || /^\/t\/[\w-]+/.test(url.pathname);
   }
+  if (siteId === "rutube") return rutubeVideo(url.pathname);
   return false;
+}
+
+function rutubeVideo(pathname: string) {
+  if (/^\/(?:live\/)?video(?:\/private)?\/[\da-z]{32}(?:\/|$)/i.test(pathname)) return true;
+  if (/^\/(?:play\/)?embed\/[\da-z]{32}(?:\/|$)/i.test(pathname)) return true;
+  return /^\/(?:video|play)\/embed\/\d+(?:\/|$)/.test(pathname);
 }
 
 function youtubeId(url: URL) {

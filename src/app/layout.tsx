@@ -15,7 +15,7 @@ const fraunces = Fraunces({
 export const metadata: Metadata = {
   title: "Yuklab olish",
   description:
-    "YouTube, VK, Facebook, Instagram, OK va TikTok havolasidan videoni tanlangan papkaga saqlang.",
+    "YouTube, VK, Facebook, Instagram, OK, TikTok va Rutube havolasidan videoni tanlangan papkaga saqlang.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

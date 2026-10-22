@@ -8,7 +8,8 @@ export function SiteIcon({ id }: { id: Site["id"] }) {
   if (id === "facebook") return <FacebookIcon />;
   if (id === "instagram") return <InstagramIcon />;
   if (id === "ok") return <OkIcon />;
-  return <TikTokIcon />;
+  if (id === "tiktok") return <TikTokIcon />;
+  return <RutubeIcon />;
 }
 
 function YouTubeIcon() {
@@ -62,6 +63,17 @@ function OkIcon() {
         stroke="currentColor"
         strokeWidth="1.3"
         strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function RutubeIcon() {
+  return (
+    <svg viewBox="0 0 16 16" className={iconClass} aria-hidden="true">
+      <path
+        fill="currentColor"
+        d="M3.1 2.6h5.4c2.2 0 3.6 1.3 3.6 3.2 0 1.4-.7 2.4-1.9 2.9l2.5 4.7h-2.6L7.8 8.9H5.5v4.5H3.1V2.6Zm2.4 1.9v2.6h2.8c.9 0 1.4-.5 1.4-1.3s-.5-1.3-1.4-1.3H5.5Z"
       />
     </svg>
   );

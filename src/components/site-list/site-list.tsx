@@ -17,6 +17,7 @@ const tagStyle: Record<Site["id"], CSSProperties> = {
     color: "#ffffff",
     border: "1px solid transparent",
   },
+  rutube: { background: "#100943", color: "#ffffff" },
 };
 
 export function SiteList() {
